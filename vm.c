@@ -1,7 +1,9 @@
+#include <stdio.h>
+
 #include "vm.h"
 #include "common.h"
+#include "compiler.h"
 #include "debug.h"
-#include <stdio.h>
 
 VM vm;
 
@@ -49,31 +51,31 @@ static InterpretResult run() {
 #endif
         uint8_t instruction;
         switch (instruction = READ_BYTE()) {
-        case OP_CONSTANT: {
-            Value constant = READ_CONSTANT();
-            push(constant);
-            break;
-        }
-        case OP_ADD:
-            BINARY_OP(+);
-            break;
-        case OP_SUBTRACT:
-            BINARY_OP(-);
-            break;
-        case OP_MULTIPLY:
-            BINARY_OP(*);
-            break;
-        case OP_DIVIDE:
-            BINARY_OP(/);
-            break;
-        case OP_NEGATE:
-            push(-pop());
-            break;
-        case OP_RETURN: {
-            printValue(pop());
-            printf("\n");
-            return INTERPRET_OK;
-        }
+            case OP_CONSTANT: {
+                                  Value constant = READ_CONSTANT();
+                                  push(constant);
+                                  break;
+                              }
+            case OP_ADD:
+                              BINARY_OP(+);
+                              break;
+            case OP_SUBTRACT:
+                              BINARY_OP(-);
+                              break;
+            case OP_MULTIPLY:
+                              BINARY_OP(*);
+                              break;
+            case OP_DIVIDE:
+                              BINARY_OP(/);
+                              break;
+            case OP_NEGATE:
+                              push(-pop());
+                              break;
+            case OP_RETURN: {
+                                printValue(pop());
+                                printf("\n");
+                                return INTERPRET_OK;
+                            }
         }
     }
 
@@ -82,10 +84,7 @@ static InterpretResult run() {
 #undef BINARY_OP
 }
 
-InterpretResult interpret(Chunk *chunk) {
-    vm.chunk = chunk;
-    vm.ip = vm.chunk->code;
-
-    InterpretResult result = run();
-    return result;
+InterpretResult interpret(const char *source) {
+    compile(source);
+    return INTERPRET_OK;
 }
